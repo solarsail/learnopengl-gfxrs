@@ -1,0 +1,21 @@
+[package]
+name = "learnopengl-gfxrs"
+version = "0.1.0"
+authors = ["solarsail <newleaf.lu@gmail.com>"]
+
+[dependencies]
+gfx = "0.16"
+glutin = "0.9"
+gfx_window_glutin = "0.17"
+
+[[bin]]
+name = "hello-window"
+path = "src/103-hello-window/main.rs"
+
+[[bin]]
+name = "hello-triangle"
+path = "src/104-hello-triangle/main.rs"
+
+[[bin]]
+name = "hello-triangle-revised"
+path = "src/104-hello-triangle-revised/main.rs"
