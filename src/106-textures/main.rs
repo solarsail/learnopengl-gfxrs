@@ -2,8 +2,8 @@
 extern crate gfx;
 extern crate gfx_window_glutin;
 extern crate glutin;
+extern crate image;
 
-use std::time;
 use gfx::Device;
 use glutin::GlContext;
 use gfx::traits::FactoryExt;
@@ -36,17 +36,20 @@ fn main() {
         )
         .unwrap();
 
-    let (vertex_buffer, slice) =
-        factory.create_vertex_buffer_with_slice(model::vertices().as_slice(), ());
-    let modifier_buffer = factory.create_constant_buffer(1);
+    let (vertex_buffer, slice) = factory
+        .create_vertex_buffer_with_slice(model::vertices().as_slice(), model::indices().as_slice());
+    let texture1 = render::load_texture(&mut factory, "textures/container.jpg");
+    let texture2 = render::load_texture(&mut factory, "textures/awesomeface.png");
+    let sampler1 = factory.create_sampler_linear();
+    let sampler2 = factory.create_sampler_linear();
 
     let mut data = render::pipe::Data {
         vbuf: vertex_buffer,
-        modifier: modifier_buffer,
+        texture1: (texture1, sampler1),
+        texture2: (texture2, sampler2),
         out: render_target,
     };
 
-    let start_time = time::Instant::now();
     let mut running = true;
     while running {
         events_loop.poll_events(|event| {
@@ -79,14 +82,7 @@ fn main() {
             }
         });
 
-        let elapsed = time::Instant::now().duration_since(start_time);
-        let tvalue = elapsed.as_secs() as f32 + elapsed.subsec_nanos() as f32 / 1e9;
-        let color_mod = [tvalue.sin(), tvalue.cos(), -tvalue.sin()];
-        let modifier = render::Modifier { color_mod };
         encoder.clear(&data.out, render::BLACK);
-        encoder
-            .update_buffer(&data.modifier, &[modifier], 0)
-            .unwrap();
         encoder.draw(&slice, &pso, &data);
         encoder.flush(&mut device);
         window.swap_buffers().unwrap();
