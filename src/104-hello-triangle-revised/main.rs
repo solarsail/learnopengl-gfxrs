@@ -29,8 +29,8 @@ fn main() {
 
     let pso = factory
         .create_pipeline_simple(
-            include_bytes!("shader/104.vert"),
-            include_bytes!("shader/104.frag"),
+            include_bytes!("shader/vertex.glsl"),
+            include_bytes!("shader/fragment.glsl"),
             render::pipe::new(), // instantiates the pipe defined in `gfx_defines!`
         )
         .unwrap();

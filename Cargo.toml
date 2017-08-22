@@ -19,3 +19,7 @@ path = "src/104-hello-triangle/main.rs"
 [[bin]]
 name = "hello-triangle-revised"
 path = "src/104-hello-triangle-revised/main.rs"
+
+[[bin]]
+name = "shaders"
+path = "src/105-shaders/main.rs"
