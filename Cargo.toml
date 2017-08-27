@@ -8,6 +8,7 @@ gfx = "0.16"
 glutin = "0.9"
 gfx_window_glutin = "0.17"
 image = "0.15"
+cgmath = "0.15"
 
 [[bin]]
 name = "hello-window"
@@ -28,3 +29,7 @@ path = "src/105-shaders/main.rs"
 [[bin]]
 name = "textures"
 path = "src/106-textures/main.rs"
+
+[[bin]]
+name = "translations"
+path = "src/106-translations/main.rs"
