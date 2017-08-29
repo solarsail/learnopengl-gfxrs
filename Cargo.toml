@@ -34,3 +34,7 @@ path = "src/106-textures/main.rs"
 [[bin]]
 name = "transformations"
 path = "src/107-transformations/main.rs"
+
+[[bin]]
+name = "coordinate"
+path = "src/108-coordinate/main.rs"
