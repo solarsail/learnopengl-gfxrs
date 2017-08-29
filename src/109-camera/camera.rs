@@ -39,7 +39,7 @@ impl Camera {
         }
     }
 
-    pub fn prep_move(&mut self, dir: Direction, m: bool) {
+    pub fn towards(&mut self, dir: Direction, m: bool) {
         let index = match dir {
             Direction::Up => 0,
             Direction::Down => 1,

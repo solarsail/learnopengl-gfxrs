@@ -1,16 +1,17 @@
+
+extern crate cgmath;
+extern crate find_folder;
 #[macro_use]
 extern crate gfx;
 extern crate gfx_window_glutin;
 extern crate glutin;
 extern crate image;
-extern crate cgmath;
-extern crate find_folder;
 
 use std::time;
 use gfx::Device;
 use glutin::GlContext;
 use gfx::traits::FactoryExt;
-use cgmath::{Deg, Matrix4, PerspectiveFov, Rad, Vector3, Point3};
+use cgmath::{Deg, Matrix4, PerspectiveFov, Point3, Rad, Vector3};
 use cgmath::prelude::*;
 
 mod render;
@@ -83,7 +84,8 @@ fn main() {
                 match event {
                     KeyboardInput {
                         input: glutin::KeyboardInput {
-                            virtual_keycode: Some(VirtualKeyCode::Escape), ..
+                            virtual_keycode: Some(VirtualKeyCode::Escape),
+                            ..
                         },
                         ..
                     } |
@@ -97,27 +99,17 @@ fn main() {
                             ..
                         },
                         ..
-                    } => {
-                        match (state, vk) {
-                            (Pressed, VirtualKeyCode::W) => camera.prep_move(Direction::Up, true),
-                            (Pressed, VirtualKeyCode::S) => camera.prep_move(Direction::Down, true),
-                            (Pressed, VirtualKeyCode::A) => camera.prep_move(Direction::Left, true),
-                            (Pressed, VirtualKeyCode::D) => {
-                                camera.prep_move(Direction::Right, true)
-                            }
-                            (Released, VirtualKeyCode::W) => camera.prep_move(Direction::Up, false),
-                            (Released, VirtualKeyCode::S) => {
-                                camera.prep_move(Direction::Down, false)
-                            }
-                            (Released, VirtualKeyCode::A) => {
-                                camera.prep_move(Direction::Left, false)
-                            }
-                            (Released, VirtualKeyCode::D) => {
-                                camera.prep_move(Direction::Right, false)
-                            }
-                            _ => {}
-                        }
-                    }
+                    } => match (state, vk) {
+                        (Pressed, VirtualKeyCode::W) => camera.towards(Direction::Up, true),
+                        (Pressed, VirtualKeyCode::S) => camera.towards(Direction::Down, true),
+                        (Pressed, VirtualKeyCode::A) => camera.towards(Direction::Left, true),
+                        (Pressed, VirtualKeyCode::D) => camera.towards(Direction::Right, true),
+                        (Released, VirtualKeyCode::W) => camera.towards(Direction::Up, false),
+                        (Released, VirtualKeyCode::S) => camera.towards(Direction::Down, false),
+                        (Released, VirtualKeyCode::A) => camera.towards(Direction::Left, false),
+                        (Released, VirtualKeyCode::D) => camera.towards(Direction::Right, false),
+                        _ => {}
+                    },
                     Resized(_width, _height) => {
                         width = _width;
                         height = _height;
