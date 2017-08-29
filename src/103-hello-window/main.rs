@@ -40,9 +40,11 @@ fn main() {
                             running = false; // cannot `break` in closure
                         }
                         Resized(_width, _height) => {
-                            gfx_window_glutin::update_views(&window,
-                                                            &mut render_target,
-                                                            &mut depth_stencil);
+                            gfx_window_glutin::update_views(
+                                &window,
+                                &mut render_target,
+                                &mut depth_stencil,
+                            );
                         }
                         _ => {}
                     }

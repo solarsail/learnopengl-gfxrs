@@ -57,8 +57,7 @@ fn main() {
                     match event {
                         KeyboardInput {
                             input: glutin::KeyboardInput {
-                                virtual_keycode: Some(VirtualKeyCode::Escape),
-                                ..
+                                virtual_keycode: Some(VirtualKeyCode::Escape), ..
                             },
                             ..
                         } |

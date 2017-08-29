@@ -40,8 +40,10 @@ fn main() {
         )
         .unwrap();
 
-    let (vertex_buffer, slice) = factory
-        .create_vertex_buffer_with_slice(model::vertices().as_slice(), model::indices().as_slice());
+    let (vertex_buffer, slice) = factory.create_vertex_buffer_with_slice(
+        model::vertices().as_slice(),
+        model::indices().as_slice(),
+    );
     let translations_buffer = factory.create_constant_buffer(1);
     let texture1 = render::load_texture(&mut factory, "textures/container.jpg");
     let texture2 = render::load_texture(&mut factory, "textures/awesomeface.png");
@@ -67,8 +69,7 @@ fn main() {
                     match event {
                         KeyboardInput {
                             input: glutin::KeyboardInput {
-                                virtual_keycode: Some(VirtualKeyCode::Escape),
-                                ..
+                                virtual_keycode: Some(VirtualKeyCode::Escape), ..
                             },
                             ..
                         } |
@@ -92,8 +93,7 @@ fn main() {
         let elapsed = time::Instant::now().duration_since(start_time);
         let tvalue = elapsed.as_secs() as f32 + elapsed.subsec_nanos() as f32 / 1e9;
         let translation = Matrix4::from_translation(Vector3::new(0.5, -0.5, 0.0));
-        let rotation: Matrix4<f32> = Matrix4::from_angle_z(Rad(tvalue)).into();
-                    // explictly declare the generic type to avoid error[E0619]
+        let rotation = Matrix4::from_angle_z(Rad(tvalue));
         let trans = translation * rotation;
         let translation = render::Transform { trans: trans.into() };
         encoder.clear(&data.out, render::BLACK);

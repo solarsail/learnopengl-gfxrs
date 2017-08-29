@@ -37,8 +37,10 @@ fn main() {
         )
         .unwrap();
 
-    let (vertex_buffer, slice) = factory
-        .create_vertex_buffer_with_slice(model::vertices().as_slice(), model::indices().as_slice());
+    let (vertex_buffer, slice) = factory.create_vertex_buffer_with_slice(
+        model::vertices().as_slice(),
+        model::indices().as_slice(),
+    );
     let texture1 = render::load_texture(&mut factory, "textures/container.jpg");
     let texture2 = render::load_texture(&mut factory, "textures/awesomeface.png");
     let sampler1 = factory.create_sampler_linear();
@@ -61,8 +63,7 @@ fn main() {
                     match event {
                         KeyboardInput {
                             input: glutin::KeyboardInput {
-                                virtual_keycode: Some(VirtualKeyCode::Escape),
-                                ..
+                                virtual_keycode: Some(VirtualKeyCode::Escape), ..
                             },
                             ..
                         } |
