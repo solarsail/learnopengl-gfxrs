@@ -38,3 +38,7 @@ path = "src/107-transformations/main.rs"
 [[bin]]
 name = "coordinate"
 path = "src/108-coordinate/main.rs"
+
+[[bin]]
+name = "camera"
+path = "src/109-camera/main.rs"

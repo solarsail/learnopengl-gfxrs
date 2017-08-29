@@ -10,11 +10,14 @@ use std::time;
 use gfx::Device;
 use glutin::GlContext;
 use gfx::traits::FactoryExt;
-use cgmath::{Deg, Matrix4, PerspectiveFov, Rad, Vector3};
+use cgmath::{Deg, Matrix4, PerspectiveFov, Rad, Vector3, Point3};
 use cgmath::prelude::*;
 
 mod render;
 mod model;
+mod camera;
+
+use camera::{Camera, Direction};
 
 
 fn main() {
@@ -58,14 +61,24 @@ fn main() {
         out_depth: depth_stencil,
     };
 
+    let mut camera = Camera::new(Point3::new(0.0, 0.0, 3.0), Point3::new(0.0, 0.0, 0.0));
+    camera.move_at_speed(2.5);
+
+    // Game loop
     let start_time = time::Instant::now();
+    let mut last_frame = time::Instant::now();
+    let mut dt;
     let mut running = true;
     let mut width = 1024;
     let mut height = 768;
     while running {
+        let current_frame = time::Instant::now();
+        dt = current_frame.duration_since(last_frame);
+        last_frame = current_frame;
         events_loop.poll_events(|event| {
             use glutin::WindowEvent::*;
             use glutin::VirtualKeyCode;
+            use glutin::ElementState::*;
             match event {
                 glutin::Event::WindowEvent { event, .. } => {
                     match event {
@@ -77,6 +90,42 @@ fn main() {
                         } |
                         Closed => {
                             running = false; // cannot `break` in closure
+                        }
+                        KeyboardInput {
+                            input: glutin::KeyboardInput {
+                                state,
+                                virtual_keycode: Some(vk),
+                                ..
+                            },
+                            ..
+                        } => {
+                            match (state, vk) {
+                                (Pressed, VirtualKeyCode::W) => {
+                                    camera.prep_move(Direction::Up, true)
+                                }
+                                (Pressed, VirtualKeyCode::S) => {
+                                    camera.prep_move(Direction::Down, true)
+                                }
+                                (Pressed, VirtualKeyCode::A) => {
+                                    camera.prep_move(Direction::Left, true)
+                                }
+                                (Pressed, VirtualKeyCode::D) => {
+                                    camera.prep_move(Direction::Right, true)
+                                }
+                                (Released, VirtualKeyCode::W) => {
+                                    camera.prep_move(Direction::Up, false)
+                                }
+                                (Released, VirtualKeyCode::S) => {
+                                    camera.prep_move(Direction::Down, false)
+                                }
+                                (Released, VirtualKeyCode::A) => {
+                                    camera.prep_move(Direction::Left, false)
+                                }
+                                (Released, VirtualKeyCode::D) => {
+                                    camera.prep_move(Direction::Right, false)
+                                }
+                                _ => {}
+                            }
                         }
                         Resized(_width, _height) => {
                             width = _width;
@@ -93,22 +142,22 @@ fn main() {
                 _ => {}
             }
         });
-        let elapsed = time::Instant::now().duration_since(start_time);
-        let tvalue = elapsed.as_secs() as f32 + elapsed.subsec_nanos() as f32 / 1e9;
+        let tvalue = dt.as_secs() as f32 + dt.subsec_nanos() as f32 / 1e9;
+        camera.move_for(tvalue);
         let projection: Matrix4<f32> = PerspectiveFov {
             fovy: Deg(45.0).into(),
             aspect: width as f32 / height as f32,
             near: 0.1,
             far: 100.0,
         }.into();
-        let view = Matrix4::from_translation(Vector3::new(0.0, 0.0, -3.0));
+        let view = Matrix4::look_at(camera.pos(), camera.looking_at(), Vector3::unit_y());
         encoder.clear(&data.out, render::BLACK);
         encoder.clear_depth(&data.out_depth, 1.0);
         for (i, pos) in model::cube_pos().into_iter().enumerate() {
             let trans = Matrix4::from_translation(pos);
             let rot = Matrix4::from_axis_angle(
                 Vector3::new(0.5, 1.0, 0.0).normalize(),
-                Rad(tvalue) + Rad::from(Deg(i as f32 * 20.0)),
+                Rad::from(Deg(i as f32 * 20.0)),
             );
             let model = trans * rot;
             let translation = render::Transform {
