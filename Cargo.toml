@@ -9,6 +9,7 @@ glutin = "0.9"
 gfx_window_glutin = "0.17"
 image = "0.15"
 cgmath = "0.15"
+find_folder = "0.3"
 
 [[bin]]
 name = "hello-window"
@@ -31,5 +32,5 @@ name = "textures"
 path = "src/106-textures/main.rs"
 
 [[bin]]
-name = "translations"
-path = "src/106-translations/main.rs"
+name = "transformations"
+path = "src/107-transformations/main.rs"

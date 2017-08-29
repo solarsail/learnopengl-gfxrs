@@ -6,7 +6,7 @@ out vec2 TexCoord;
 
 uniform Transform {
     mat4 transform;
-}
+};
 
 void main()
 {

@@ -1,6 +1,7 @@
 use gfx;
 use gfx::format::Formatted;
 use image;
+use find_folder::Search;
 
 pub type ColorFormat = gfx::format::Srgba8;
 pub type DepthFormat = gfx::format::DepthStencil;
@@ -41,6 +42,7 @@ where
     F: gfx::Factory<R>,
     R: gfx::Resources,
 {
+    let path = Search::ParentsThenKids(3, 3).for_folder(path).unwrap();
     let img = image::open(path).unwrap().to_rgba();
     let (width, height) = img.dimensions();
     let kind = gfx::texture::Kind::D2(width as u16, height as u16, gfx::texture::AaMode::Single);

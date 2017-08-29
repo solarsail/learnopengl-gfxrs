@@ -3,11 +3,14 @@ extern crate gfx;
 extern crate gfx_window_glutin;
 extern crate glutin;
 extern crate image;
+extern crate cgmath;
 extern crate find_folder;
 
+use std::time;
 use gfx::Device;
 use glutin::GlContext;
 use gfx::traits::FactoryExt;
+use cgmath::{Vector3, Matrix4, Rad};
 
 mod render;
 mod model;
@@ -39,6 +42,7 @@ fn main() {
 
     let (vertex_buffer, slice) = factory
         .create_vertex_buffer_with_slice(model::vertices().as_slice(), model::indices().as_slice());
+    let translations_buffer = factory.create_constant_buffer(1);
     let texture1 = render::load_texture(&mut factory, "textures/container.jpg");
     let texture2 = render::load_texture(&mut factory, "textures/awesomeface.png");
     let sampler1 = factory.create_sampler_linear();
@@ -46,11 +50,13 @@ fn main() {
 
     let mut data = render::pipe::Data {
         vbuf: vertex_buffer,
+        transform: translations_buffer,
         texture1: (texture1, sampler1),
         texture2: (texture2, sampler2),
         out: render_target,
     };
 
+    let start_time = time::Instant::now();
     let mut running = true;
     while running {
         events_loop.poll_events(|event| {
@@ -83,7 +89,17 @@ fn main() {
             }
         });
 
+        let elapsed = time::Instant::now().duration_since(start_time);
+        let tvalue = elapsed.as_secs() as f32 + elapsed.subsec_nanos() as f32 / 1e9;
+        let translation = Matrix4::from_translation(Vector3::new(0.5, -0.5, 0.0));
+        let rotation: Matrix4<f32> = Matrix4::from_angle_z(Rad(tvalue)).into();
+                    // explictly declare the generic type to avoid error[E0619]
+        let trans = translation * rotation;
+        let translation = render::Transform { trans: trans.into() };
         encoder.clear(&data.out, render::BLACK);
+        encoder
+            .update_buffer(&data.transform, &[translation], 0)
+            .unwrap();
         encoder.draw(&slice, &pso, &data);
         encoder.flush(&mut device);
         window.swap_buffers().unwrap();

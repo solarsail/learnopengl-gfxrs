@@ -1,6 +1,7 @@
 use gfx;
 use gfx::format::Formatted;
 use image;
+use find_folder::Search;
 
 pub type ColorFormat = gfx::format::Srgba8;
 pub type DepthFormat = gfx::format::DepthStencil;
@@ -14,13 +15,15 @@ gfx_defines! {
         uv: [f32; 2] = "aTexCoord",
     }
 
-    constant Transfrom {
+    constant Transform {
         trans: [[f32; 4]; 4] = "transform",
     }
 
     pipeline pipe {
         vbuf: gfx::VertexBuffer<Vertex> = (),
         transform: gfx::ConstantBuffer<Transform> = "Transform",
+        texture1: gfx::TextureSampler<<ColorFormat as Formatted>::View> = "ourTexture1",
+        texture2: gfx::TextureSampler<<ColorFormat as Formatted>::View> = "ourTexture2",
         out: gfx::RenderTarget<ColorFormat> = "FragColor",
     }
 }
@@ -42,6 +45,7 @@ where
     F: gfx::Factory<R>,
     R: gfx::Resources,
 {
+    let path = Search::ParentsThenKids(3, 3).for_folder(path).unwrap();
     let img = image::open(path).unwrap().to_rgba();
     let (width, height) = img.dimensions();
     let kind = gfx::texture::Kind::D2(width as u16, height as u16, gfx::texture::AaMode::Single);
