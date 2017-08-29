@@ -66,31 +66,28 @@ fn main() {
         events_loop.poll_events(|event| {
             use glutin::WindowEvent::*;
             use glutin::VirtualKeyCode;
-            match event {
-                glutin::Event::WindowEvent { event, .. } => {
-                    match event {
-                        KeyboardInput {
-                            input: glutin::KeyboardInput {
-                                virtual_keycode: Some(VirtualKeyCode::Escape), ..
-                            },
-                            ..
-                        } |
-                        Closed => {
-                            running = false; // cannot `break` in closure
-                        }
-                        Resized(_width, _height) => {
-                            width = _width;
-                            height = _height;
-                            gfx_window_glutin::update_views(
-                                &window,
-                                &mut data.out,
-                                &mut data.out_depth,
-                            );
-                        }
-                        _ => {}
+            if let glutin::Event::WindowEvent { event, .. } = event {
+                match event {
+                    KeyboardInput {
+                        input: glutin::KeyboardInput {
+                            virtual_keycode: Some(VirtualKeyCode::Escape), ..
+                        },
+                        ..
+                    } |
+                    Closed => {
+                        running = false; // cannot `break` in closure
                     }
+                    Resized(_width, _height) => {
+                        width = _width;
+                        height = _height;
+                        gfx_window_glutin::update_views(
+                            &window,
+                            &mut data.out,
+                            &mut data.out_depth,
+                        );
+                    }
+                    _ => {}
                 }
-                _ => {}
             }
         });
         let elapsed = time::Instant::now().duration_since(start_time);

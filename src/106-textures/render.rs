@@ -25,12 +25,8 @@ gfx_defines! {
 }
 
 impl Vertex {
-    pub fn new(x: f32, y: f32, z: f32, r: f32, g: f32, b: f32, u: f32, v: f32) -> Vertex {
-        Vertex {
-            pos: [x, y, z],
-            color: [r, g, b],
-            uv: [u, v],
-        }
+    pub fn new(pos: [f32; 3], color: [f32; 3], uv: [f32; 2]) -> Vertex {
+        Vertex { pos, color, uv }
     }
 }
 

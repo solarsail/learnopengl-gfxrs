@@ -65,7 +65,7 @@ fn main() {
     camera.move_at_speed(2.5);
 
     // Game loop
-    let start_time = time::Instant::now();
+    let _start_time = time::Instant::now();
     let mut last_frame = time::Instant::now();
     let mut dt;
     let mut running = true;
@@ -79,67 +79,56 @@ fn main() {
             use glutin::WindowEvent::*;
             use glutin::VirtualKeyCode;
             use glutin::ElementState::*;
-            match event {
-                glutin::Event::WindowEvent { event, .. } => {
-                    match event {
-                        KeyboardInput {
-                            input: glutin::KeyboardInput {
-                                virtual_keycode: Some(VirtualKeyCode::Escape), ..
-                            },
-                            ..
-                        } |
-                        Closed => {
-                            running = false; // cannot `break` in closure
-                        }
-                        KeyboardInput {
-                            input: glutin::KeyboardInput {
-                                state,
-                                virtual_keycode: Some(vk),
-                                ..
-                            },
-                            ..
-                        } => {
-                            match (state, vk) {
-                                (Pressed, VirtualKeyCode::W) => {
-                                    camera.prep_move(Direction::Up, true)
-                                }
-                                (Pressed, VirtualKeyCode::S) => {
-                                    camera.prep_move(Direction::Down, true)
-                                }
-                                (Pressed, VirtualKeyCode::A) => {
-                                    camera.prep_move(Direction::Left, true)
-                                }
-                                (Pressed, VirtualKeyCode::D) => {
-                                    camera.prep_move(Direction::Right, true)
-                                }
-                                (Released, VirtualKeyCode::W) => {
-                                    camera.prep_move(Direction::Up, false)
-                                }
-                                (Released, VirtualKeyCode::S) => {
-                                    camera.prep_move(Direction::Down, false)
-                                }
-                                (Released, VirtualKeyCode::A) => {
-                                    camera.prep_move(Direction::Left, false)
-                                }
-                                (Released, VirtualKeyCode::D) => {
-                                    camera.prep_move(Direction::Right, false)
-                                }
-                                _ => {}
-                            }
-                        }
-                        Resized(_width, _height) => {
-                            width = _width;
-                            height = _height;
-                            gfx_window_glutin::update_views(
-                                &window,
-                                &mut data.out,
-                                &mut data.out_depth,
-                            );
-                        }
-                        _ => {}
+            if let glutin::Event::WindowEvent { event, .. } = event {
+                match event {
+                    KeyboardInput {
+                        input: glutin::KeyboardInput {
+                            virtual_keycode: Some(VirtualKeyCode::Escape), ..
+                        },
+                        ..
+                    } |
+                    Closed => {
+                        running = false; // cannot `break` in closure
                     }
+                    KeyboardInput {
+                        input: glutin::KeyboardInput {
+                            state,
+                            virtual_keycode: Some(vk),
+                            ..
+                        },
+                        ..
+                    } => {
+                        match (state, vk) {
+                            (Pressed, VirtualKeyCode::W) => camera.prep_move(Direction::Up, true),
+                            (Pressed, VirtualKeyCode::S) => camera.prep_move(Direction::Down, true),
+                            (Pressed, VirtualKeyCode::A) => camera.prep_move(Direction::Left, true),
+                            (Pressed, VirtualKeyCode::D) => {
+                                camera.prep_move(Direction::Right, true)
+                            }
+                            (Released, VirtualKeyCode::W) => camera.prep_move(Direction::Up, false),
+                            (Released, VirtualKeyCode::S) => {
+                                camera.prep_move(Direction::Down, false)
+                            }
+                            (Released, VirtualKeyCode::A) => {
+                                camera.prep_move(Direction::Left, false)
+                            }
+                            (Released, VirtualKeyCode::D) => {
+                                camera.prep_move(Direction::Right, false)
+                            }
+                            _ => {}
+                        }
+                    }
+                    Resized(_width, _height) => {
+                        width = _width;
+                        height = _height;
+                        gfx_window_glutin::update_views(
+                            &window,
+                            &mut data.out,
+                            &mut data.out_depth,
+                        );
+                    }
+                    _ => {}
                 }
-                _ => {}
             }
         });
         let tvalue = dt.as_secs() as f32 + dt.subsec_nanos() as f32 / 1e9;
