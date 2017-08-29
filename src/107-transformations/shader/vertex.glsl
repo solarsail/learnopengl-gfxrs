@@ -11,5 +11,5 @@ uniform Transform {
 void main()
 {
     gl_Position = transform * vec4(aPos, 1.0f);
-    TexCoord = vec2(aTexCoord.x, 1.0 - aTexCoord.y);
+    TexCoord = aTexCoord;
 }
