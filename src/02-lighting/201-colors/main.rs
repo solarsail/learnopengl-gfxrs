@@ -38,33 +38,33 @@ fn main() {
         .create_pipeline_simple(
             include_bytes!("shader/vertex.glsl"),
             include_bytes!("shader/obj_fragment.glsl"),
-            render::object::pipe::new(),
+            render::obj_pipe::new(),
         )
         .unwrap();
     let light_pso = factory
         .create_pipeline_simple(
             include_bytes!("shader/vertex.glsl"),
             include_bytes!("shader/light_fragment.glsl"),
-            render::light::pipe::new(),
+            render::light_pipe::new(),
         )
         .unwrap();
 
     let (obj_vertex_buffer, obj_slice) =
-        factory.create_vertex_buffer_with_slice(model::obj_vertices().as_slice(), ());
+        factory.create_vertex_buffer_with_slice(model::vertices().as_slice(), ());
     let (light_vertex_buffer, light_slice) =
-        factory.create_vertex_buffer_with_slice(model::light_vertices().as_slice(), ());
+        factory.create_vertex_buffer_with_slice(model::vertices().as_slice(), ());
     let obj_trans_buffer = factory.create_constant_buffer(1);
     let light_trans_buffer = factory.create_constant_buffer(1);
     let obj_light_buffer = factory.create_constant_buffer(1);
 
-    let mut obj_data = render::object::pipe::Data {
+    let mut obj_data = render::obj_pipe::Data {
         vbuf: obj_vertex_buffer,
         transform: obj_trans_buffer,
         light: obj_light_buffer,
         out: render_target.clone(),
         out_depth: depth_stencil.clone(),
     };
-    let mut light_data = render::light::pipe::Data {
+    let mut light_data = render::light_pipe::Data {
         vbuf: light_vertex_buffer,
         transform: light_trans_buffer,
         out: render_target.clone(),
@@ -179,22 +179,17 @@ fn main() {
         let trans = Matrix4::from_translation(Vector3::new(1.2, 1.0, 2.0));
         let scale = Matrix4::from_scale(0.2);
         let light_model = trans * scale;
-        let obj_translation = render::object::Transform {
+        let obj_translation = render::Transform {
             model: obj_model.into(),
             view: view.into(),
             projection: projection.into(),
         };
-        let light_translation = render::light::Transform {
+        let light_translation = render::Transform {
             model: light_model.into(),
             view: view.into(),
             projection: projection.into(),
         };
-        let obj_light = render::object::Lighting {
-            object: [1.0, 0.5, 0.31],
-            padding1: 0.0,
-            light: [1.0, 1.0, 1.0],
-            padding2: 0.0,
-        };
+        let obj_light = render::Lighting::new([1.0, 0.5, 0.31], [1.0, 1.0, 1.0]);
         
         encoder.clear(&render_target, render::BLACK);
         encoder.clear_depth(&depth_stencil, 1.0);
