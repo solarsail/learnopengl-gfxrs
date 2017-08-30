@@ -71,6 +71,7 @@ fn main() {
     let mut pitch = 0.0;
     let mut yaw = -90.0;
     let sensitivity = 0.1;
+    let mut first_mouse = true;
     let mut camera = CameraBuilder::new(Point3::new(0.0, 0.0, 3.0), Vector3::unit_y())
         .aspect(width, height)
         .build();
@@ -108,8 +109,16 @@ fn main() {
                         _ => {}
                     },
                     MouseMoved {
-                        position: (x, y), ..
+                        position: (mut x, mut y), ..
                     } => {
+                        if first_mouse {
+                            if x == width as f64 / 2.0 && y == height as f64 / 2.0 {
+                                first_mouse = false;
+                            } else {
+                                x = width as f64 / 2.0;
+                                y = height as f64 / 2.0;
+                            }
+                        }
                         let dx = x as f32 - width / 2.0;
                         let dy = height / 2.0 - y as f32;
                         yaw += dx * sensitivity;
@@ -118,6 +127,9 @@ fn main() {
                         window
                             .set_cursor_position(width as i32 / 2, height as i32 / 2)
                             .unwrap();
+                    }
+                    Focused(true) => {
+                        first_mouse = true;
                     }
                     MouseEntered { .. } => {
                         window
@@ -146,8 +158,8 @@ fn main() {
         });
 
         let tvalue = dt.as_secs() as f32 + dt.subsec_nanos() as f32 / 1e9;
-
         camera.move_for(tvalue);
+
         let projection = camera.projection_matrix();
         let view = camera.view_matrix();
 
