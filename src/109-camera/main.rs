@@ -10,14 +10,14 @@ use std::time;
 use gfx::Device;
 use glutin::GlContext;
 use gfx::traits::FactoryExt;
-use cgmath::{Deg, Matrix4, PerspectiveFov, Point3, Rad, Vector3};
+use cgmath::{Deg, Matrix4, Point3, Rad, Vector3};
 use cgmath::prelude::*;
 
 mod render;
 mod model;
 mod camera;
 
-use camera::{Camera, Direction};
+use camera::{CameraBuilder, MovementDirection as MD};
 
 
 fn main() {
@@ -61,26 +61,27 @@ fn main() {
         out_depth: depth_stencil,
     };
 
-    let mut camera = Camera::new(Point3::new(0.0, 0.0, 3.0), Point3::new(0.0, 0.0, 0.0));
-    camera.move_at_speed(2.5);
-
     // Game loop
     let _start_time = time::Instant::now();
     let mut last_frame = time::Instant::now();
     let mut dt;
     let mut running = true;
-    let mut width = 1024;
-    let mut height = 768;
+    let mut width = 1024.0;
+    let mut height = 768.0;
     let mut pitch = 0.0;
     let mut yaw = -90.0;
     let sensitivity = 0.1;
+    let mut camera = CameraBuilder::new(Point3::new(0.0, 0.0, 3.0), Vector3::unit_y())
+        .aspect(width, height)
+        .build();
+
     while running {
         let current_frame = time::Instant::now();
         dt = current_frame.duration_since(last_frame);
         last_frame = current_frame;
         events_loop.poll_events(|event| {
             use glutin::WindowEvent::*;
-            use glutin::VirtualKeyCode;
+            use glutin::{MouseScrollDelta, VirtualKeyCode};
             use glutin::ElementState::*;
             if let glutin::Event::WindowEvent { event, .. } = event {
                 match event {
@@ -95,31 +96,25 @@ fn main() {
                         },
                         ..
                     } => match (state, vk) {
-                        (Pressed, VirtualKeyCode::W) => camera.towards(Direction::Up, true),
-                        (Pressed, VirtualKeyCode::S) => camera.towards(Direction::Down, true),
-                        (Pressed, VirtualKeyCode::A) => camera.towards(Direction::Left, true),
-                        (Pressed, VirtualKeyCode::D) => camera.towards(Direction::Right, true),
-                        (Released, VirtualKeyCode::W) => camera.towards(Direction::Up, false),
-                        (Released, VirtualKeyCode::S) => camera.towards(Direction::Down, false),
-                        (Released, VirtualKeyCode::A) => camera.towards(Direction::Left, false),
-                        (Released, VirtualKeyCode::D) => camera.towards(Direction::Right, false),
+                        (Pressed, VirtualKeyCode::W) => camera.move_towards(MD::Up, true),
+                        (Pressed, VirtualKeyCode::S) => camera.move_towards(MD::Down, true),
+                        (Pressed, VirtualKeyCode::A) => camera.move_towards(MD::Left, true),
+                        (Pressed, VirtualKeyCode::D) => camera.move_towards(MD::Right, true),
+                        (Released, VirtualKeyCode::W) => camera.move_towards(MD::Up, false),
+                        (Released, VirtualKeyCode::S) => camera.move_towards(MD::Down, false),
+                        (Released, VirtualKeyCode::A) => camera.move_towards(MD::Left, false),
+                        (Released, VirtualKeyCode::D) => camera.move_towards(MD::Right, false),
                         (_, VirtualKeyCode::Escape) => running = false,
                         _ => {}
                     },
                     MouseMoved {
                         position: (x, y), ..
                     } => {
-                        let dx = x - width as f64 / 2.0;
-                        let dy = height as f64 / 2.0 - y;
+                        let dx = x as f32 - width / 2.0;
+                        let dy = height / 2.0 - y as f32;
                         yaw += dx * sensitivity;
                         pitch += dy * sensitivity;
-                        if pitch > 89.0 {
-                            pitch = 89.0;
-                        }
-                        if pitch < -89.0 {
-                            pitch = -89.0;
-                        }
-                        camera.free_move(pitch as f32, yaw as f32);
+                        camera.look_around(pitch, yaw);
                         window
                             .set_cursor_position(width as i32 / 2, height as i32 / 2)
                             .unwrap();
@@ -129,9 +124,16 @@ fn main() {
                             .set_cursor_position(width as i32 / 2, height as i32 / 2)
                             .unwrap();
                     }
-                    Resized(_width, _height) => {
-                        width = _width;
-                        height = _height;
+                    MouseWheel {
+                        delta: MouseScrollDelta::LineDelta(_, dy),
+                        ..
+                    } => {
+                        camera.zoom(dy);
+                    }
+                    Resized(w, h) => {
+                        width = w as f32;
+                        height = h as f32;
+                        camera.update_aspect(width, height);
                         gfx_window_glutin::update_views(
                             &window,
                             &mut data.out,
@@ -142,15 +144,13 @@ fn main() {
                 }
             }
         });
+
         let tvalue = dt.as_secs() as f32 + dt.subsec_nanos() as f32 / 1e9;
+
         camera.move_for(tvalue);
-        let projection: Matrix4<f32> = PerspectiveFov {
-            fovy: Deg(45.0).into(),
-            aspect: width as f32 / height as f32,
-            near: 0.1,
-            far: 100.0,
-        }.into();
-        let view = Matrix4::look_at(camera.pos(), camera.looking_at(), Vector3::unit_y());
+        let projection = camera.projection_matrix();
+        let view = camera.view_matrix();
+
         encoder.clear(&data.out, render::BLACK);
         encoder.clear_depth(&data.out_depth, 1.0);
         for (i, pos) in model::cube_pos().into_iter().enumerate() {
