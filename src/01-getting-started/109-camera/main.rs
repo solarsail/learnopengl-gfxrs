@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate approx;
 extern crate cgmath;
 extern crate find_folder;
 #[macro_use]
@@ -109,10 +111,13 @@ fn main() {
                         _ => {}
                     },
                     MouseMoved {
-                        position: (mut x, mut y), ..
+                        position: (mut x, mut y),
+                        ..
                     } => {
                         if first_mouse {
-                            if x == width as f64 / 2.0 && y == height as f64 / 2.0 {
+                            if relative_eq!(x, width as f64 / 2.0) &&
+                                relative_eq!(y, height as f64 / 2.0)
+                            {
                                 first_mouse = false;
                             } else {
                                 x = width as f64 / 2.0;

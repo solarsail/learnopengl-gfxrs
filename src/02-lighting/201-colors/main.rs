@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate approx;
 extern crate cgmath;
 #[macro_use]
 extern crate gfx;
@@ -97,7 +99,8 @@ fn main() {
                 match event {
                     Closed => {
                         running = false; // cannot `break` in closure
-                    }KeyboardInput {
+                    }
+                    KeyboardInput {
                         input: glutin::KeyboardInput {
                             state,
                             virtual_keycode: Some(vk),
@@ -115,12 +118,15 @@ fn main() {
                         (Released, VirtualKeyCode::D) => camera.move_towards(MD::Right, false),
                         (_, VirtualKeyCode::Escape) => running = false,
                         _ => {}
-                    }
+                    },
                     MouseMoved {
-                        position: (mut x, mut y), ..
+                        position: (mut x, mut y),
+                        ..
                     } => {
                         if first_mouse {
-                            if x == width as f64 / 2.0 && y == height as f64 / 2.0 {
+                            if relative_eq!(x, width as f64 / 2.0) &&
+                                relative_eq!(y, height as f64 / 2.0)
+                            {
                                 first_mouse = false;
                             } else {
                                 x = width as f64 / 2.0;
@@ -190,7 +196,7 @@ fn main() {
             projection: projection.into(),
         };
         let obj_light = render::Lighting::new([1.0, 0.5, 0.31], [1.0, 1.0, 1.0]);
-        
+
         encoder.clear(&render_target, render::BLACK);
         encoder.clear_depth(&depth_stencil, 1.0);
         encoder

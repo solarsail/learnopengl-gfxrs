@@ -10,6 +10,7 @@ gfx_window_glutin = "0.17"
 image = "0.15"
 cgmath = "0.15"
 find_folder = "0.3"
+approx = "0.1"
 
 [[bin]]
 name = "hello-window"

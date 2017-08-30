@@ -19,9 +19,9 @@ gfx_defines! {
 
     constant Lighting {
         object: [f32; 3] = "objectColor",
-        padding1: f32 = "pad1",
+        padding1: f32 = "pad1", // prevents the shader/code offset mismatch error
         light: [f32; 3] = "lightColor",
-        padding2: f32 = "pad2",
+        padding2: f32 = "pad2", // prevents the shader/code offset mismatch error
     }
 
     pipeline obj_pipe {
