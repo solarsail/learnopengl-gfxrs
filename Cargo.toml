@@ -13,32 +13,32 @@ find_folder = "0.3"
 
 [[bin]]
 name = "hello-window"
-path = "src/103-hello-window/main.rs"
+path = "src/01-getting-started/103-hello-window/main.rs"
 
 [[bin]]
 name = "hello-triangle"
-path = "src/104-hello-triangle/main.rs"
+path = "src/01-getting-started/104-hello-triangle/main.rs"
 
 [[bin]]
 name = "hello-triangle-revised"
-path = "src/104-hello-triangle-revised/main.rs"
+path = "src/01-getting-started/104-hello-triangle-revised/main.rs"
 
 [[bin]]
 name = "shaders"
-path = "src/105-shaders/main.rs"
+path = "src/01-getting-started/105-shaders/main.rs"
 
 [[bin]]
 name = "textures"
-path = "src/106-textures/main.rs"
+path = "src/01-getting-started/106-textures/main.rs"
 
 [[bin]]
 name = "transformations"
-path = "src/107-transformations/main.rs"
+path = "src/01-getting-started/107-transformations/main.rs"
 
 [[bin]]
 name = "coordinate"
-path = "src/108-coordinate/main.rs"
+path = "src/01-getting-started/108-coordinate/main.rs"
 
 [[bin]]
 name = "camera"
-path = "src/109-camera/main.rs"
+path = "src/01-getting-started/109-camera/main.rs"
