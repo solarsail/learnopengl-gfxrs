@@ -42,3 +42,7 @@ path = "src/01-getting-started/108-coordinate/main.rs"
 [[bin]]
 name = "camera"
 path = "src/01-getting-started/109-camera/main.rs"
+
+[[bin]]
+name = "colors"
+path = "src/02-lighting/201-colors/main.rs"
