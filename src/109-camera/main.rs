@@ -1,4 +1,3 @@
-
 extern crate cgmath;
 extern crate find_folder;
 #[macro_use]
@@ -72,6 +71,9 @@ fn main() {
     let mut running = true;
     let mut width = 1024;
     let mut height = 768;
+    let mut pitch = 0.0;
+    let mut yaw = -90.0;
+    let sensitivity = 0.1;
     while running {
         let current_frame = time::Instant::now();
         dt = current_frame.duration_since(last_frame);
@@ -82,13 +84,6 @@ fn main() {
             use glutin::ElementState::*;
             if let glutin::Event::WindowEvent { event, .. } = event {
                 match event {
-                    KeyboardInput {
-                        input: glutin::KeyboardInput {
-                            virtual_keycode: Some(VirtualKeyCode::Escape),
-                            ..
-                        },
-                        ..
-                    } |
                     Closed => {
                         running = false; // cannot `break` in closure
                     }
@@ -108,8 +103,32 @@ fn main() {
                         (Released, VirtualKeyCode::S) => camera.towards(Direction::Down, false),
                         (Released, VirtualKeyCode::A) => camera.towards(Direction::Left, false),
                         (Released, VirtualKeyCode::D) => camera.towards(Direction::Right, false),
+                        (_, VirtualKeyCode::Escape) => running = false,
                         _ => {}
                     },
+                    MouseMoved {
+                        position: (x, y), ..
+                    } => {
+                        let dx = x - width as f64 / 2.0;
+                        let dy = height as f64 / 2.0 - y;
+                        yaw += dx * sensitivity;
+                        pitch += dy * sensitivity;
+                        if pitch > 89.0 {
+                            pitch = 89.0;
+                        }
+                        if pitch < -89.0 {
+                            pitch = -89.0;
+                        }
+                        camera.free_move(pitch as f32, yaw as f32);
+                        window
+                            .set_cursor_position(width as i32 / 2, height as i32 / 2)
+                            .unwrap();
+                    }
+                    MouseEntered { .. } => {
+                        window
+                            .set_cursor_position(width as i32 / 2, height as i32 / 2)
+                            .unwrap();
+                    }
                     Resized(_width, _height) => {
                         width = _width;
                         height = _height;

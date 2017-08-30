@@ -1,5 +1,5 @@
 use cgmath::prelude::*;
-use cgmath::{Point3, Vector3};
+use cgmath::{Deg, Point3, Vector3};
 
 
 pub enum Direction {
@@ -27,11 +27,9 @@ impl Camera {
     }
 
     pub fn movement_vector(&self) -> Option<Vector3<f32>> {
-        let v = Vector3::new(
-            self.movement[2] - self.movement[3],
-            0.0,
-            self.movement[1] - self.movement[0],
-        );
+        let x = (self.movement[2] - self.movement[3]) * self.front.cross(Vector3::unit_y());
+        let z = (self.movement[0] - self.movement[1]) * self.front;
+        let v = x + z;
         if !v.is_zero() {
             Some(v.normalize())
         } else {
@@ -63,6 +61,14 @@ impl Camera {
         self.pos
     }
 
+    pub fn free_move(&mut self, pitch: f32, yaw: f32) {
+        let f = Vector3::new(
+            Deg(yaw).cos() * Deg(pitch).cos(),
+            Deg(pitch).sin(),
+            Deg(yaw).sin() * Deg(pitch).cos(),
+        );
+        self.front = f;
+    }
     pub fn looking_at(&self) -> Point3<f32> {
         self.pos + self.front
     }
