@@ -55,3 +55,7 @@ path = "src/02-lighting/202-basic-lighting/main.rs"
 [[bin]]
 name = "basic-lighting-view"
 path = "src/02-lighting/202-basic-lighting/main_view.rs"
+
+[[bin]]
+name = "basic-lighting-revised"
+path = "src/02-lighting/202-basic-lighting-revised/main.rs"
