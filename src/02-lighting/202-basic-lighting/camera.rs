@@ -107,6 +107,7 @@ impl Camera {
         }.into()
     }
 
+    #[allow(dead_code)]
     pub fn pos(&self) -> Point3<f32> {
         self.pos
     }
