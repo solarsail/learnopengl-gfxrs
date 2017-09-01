@@ -1,5 +1,3 @@
-#[macro_use]
-extern crate approx;
 extern crate cgmath;
 #[macro_use]
 extern crate gfx;
@@ -77,14 +75,14 @@ fn main() {
     // Game loop
     let mut last_frame = time::Instant::now();
     let mut running = true;
-    let mut width = 1024.0;
-    let mut height = 768.0;
+    let mut width = 1024;
+    let mut height = 768;
     let mut pitch = 0.0;
     let mut yaw = -90.0;
     let sensitivity = 0.1;
     let mut first_mouse = true;
     let mut camera = CameraBuilder::new(Point3::new(0.0, 0.0, 3.0), Vector3::unit_y())
-        .aspect(width, height)
+        .aspect(width as f32, height as f32)
         .build();
 
     let light_pos = Vector3::new(1.2, 1.0, 2.0);
@@ -126,22 +124,20 @@ fn main() {
                         ..
                     } => {
                         if first_mouse {
-                            if relative_eq!(x, width as f64 / 2.0) &&
-                                relative_eq!(y, height as f64 / 2.0)
-                            {
+                            if x as i32 == width / 2 && y as i32 == height / 2 {
                                 first_mouse = false;
                             } else {
                                 x = width as f64 / 2.0;
                                 y = height as f64 / 2.0;
                             }
                         }
-                        let dx = x as f32 - width / 2.0;
-                        let dy = height / 2.0 - y as f32;
+                        let dx = x as f32 - width as f32 / 2.0;
+                        let dy = height as f32 / 2.0 - y as f32;
                         yaw += dx * sensitivity;
                         pitch += dy * sensitivity;
                         camera.look_around(pitch, yaw);
                         window
-                            .set_cursor_position(width as i32 / 2, height as i32 / 2)
+                            .set_cursor_position(width / 2, height / 2)
                             .unwrap();
                     }
                     Focused(true) => {
@@ -149,7 +145,7 @@ fn main() {
                     }
                     MouseEntered { .. } => {
                         window
-                            .set_cursor_position(width as i32 / 2, height as i32 / 2)
+                            .set_cursor_position(width / 2, height / 2)
                             .unwrap();
                     }
                     MouseWheel {
@@ -159,9 +155,9 @@ fn main() {
                         camera.zoom(dy);
                     }
                     Resized(w, h) => {
-                        width = w as f32;
-                        height = h as f32;
-                        camera.update_aspect(width, height);
+                        width = w as i32;
+                        height = h as i32;
+                        camera.update_aspect(width as f32, height as f32);
                         gfx_window_glutin::update_views(
                             &window,
                             &mut obj_data.out,

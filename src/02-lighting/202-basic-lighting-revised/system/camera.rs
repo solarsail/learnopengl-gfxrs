@@ -34,7 +34,7 @@ impl CameraSystem {
 
     pub fn run(&mut self, ctx: &mut Context, dt: f32) {
         self.camera
-            .update_aspect(ctx.screen_width, ctx.screen_height);
+            .update_aspect(ctx.screen_width as f32, ctx.screen_height as f32);
         for (key, value) in KEY_MAP.iter() {
             self.camera
                 .move_towards(*value, ctx.key_state.is_pressed(*key));

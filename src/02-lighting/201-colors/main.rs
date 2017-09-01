@@ -1,5 +1,3 @@
-#[macro_use]
-extern crate approx;
 extern crate cgmath;
 #[macro_use]
 extern crate gfx;
@@ -123,8 +121,8 @@ fn main() {
                         ..
                     } => {
                         if first_mouse {
-                            if relative_eq!(x, width as f64 / 2.0) &&
-                                relative_eq!(y, height as f64 / 2.0)
+                            if x as i32 == width as i32 / 2 &&
+                                y as i32 == height as i32 / 2
                             {
                                 first_mouse = false;
                             } else {

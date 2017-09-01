@@ -1,5 +1,3 @@
-#[macro_use]
-extern crate approx;
 extern crate cgmath;
 #[macro_use]
 extern crate gfx;
@@ -26,8 +24,8 @@ use context::Context;
 use camera::CameraBuilder;
 
 
-const SCREEN_WIDTH: f32 = 1024.0;
-const SCREEN_HEIGHT: f32 = 768.0;
+const SCREEN_WIDTH: i32 = 1024;
+const SCREEN_HEIGHT: i32 = 768;
 
 fn main() {
     let mut events_loop = glutin::EventsLoop::new();
@@ -86,7 +84,7 @@ fn main() {
     let mut last_frame = time::Instant::now();
     let mut running = true;
     let camera = CameraBuilder::new(Point3::new(0.0, 0.0, 3.0), Vector3::unit_y())
-        .aspect(SCREEN_WIDTH, SCREEN_HEIGHT)
+        .aspect(SCREEN_WIDTH as f32, SCREEN_HEIGHT as f32)
         .build();
 
     let light_pos = Vector3::new(1.2, 1.0, 2.0);
@@ -123,7 +121,7 @@ fn main() {
                     MouseMoved {
                         position: (x, y), ..
                     } => {
-                        context.update_mouse_pos(&window, x as f32, y as f32);
+                        context.update_mouse_pos(&window, x as i32, y as i32);
                     }
                     Focused(true) => {
                         context.focused();
@@ -138,7 +136,7 @@ fn main() {
                         context.mouse_state.update_scroll(dy);
                     }
                     Resized(w, h) => {
-                        context.update_dimensions(w as f32, h as f32);
+                        context.update_dimensions(w, h);
                         gfx_window_glutin::update_views(
                             &window,
                             &mut obj_data.out,
