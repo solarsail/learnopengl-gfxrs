@@ -8,6 +8,7 @@ in vec3 LightPos;
 uniform Lighting {
     vec3 objectColor;
     vec3 lightColor;
+    vec3 lightPos;
 };
 
 void main()

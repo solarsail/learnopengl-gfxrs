@@ -5,6 +5,8 @@ extern crate cgmath;
 extern crate gfx;
 extern crate gfx_window_glutin;
 extern crate glutin;
+#[macro_use]
+extern crate lazy_static;
 
 use std::time;
 use gfx::Device;
@@ -81,7 +83,6 @@ fn main() {
     let mut last_frame = time::Instant::now();
     let mut dt;
     let mut running = true;
-    let mut first_mouse = true;
     let camera = CameraBuilder::new(Point3::new(0.0, 0.0, 3.0), Vector3::unit_y())
         .aspect(1024.0, 768.0)
         .build();
@@ -120,37 +121,13 @@ fn main() {
                     MouseMoved {
                         position: (x, y), ..
                     } => {
-                        if first_mouse {
-                            // TODO: move to context
-                            if relative_eq!(x, context.screen_width as f64 / 2.0) &&
-                                relative_eq!(y, context.screen_height as f64 / 2.0)
-                            {
-                                first_mouse = false;
-                            } else {
-                                context.reset_mouse_pos();
-                            }
-                        } else {
-                            context.mouse_state.update_position(x as f32, y as f32);
-                        }
-                        window
-                            .set_cursor_position(
-                                context.screen_width as i32 / 2,
-                                context.screen_height as i32 / 2,
-                            )
-                            .unwrap();
+                        context.update_mouse_pos(&window, x as f32, y as f32);
                     }
                     Focused(true) => {
-                        // TODO: extract to context
-                        first_mouse = true;
+                        context.focused();
                     }
                     MouseEntered { .. } => {
-                        // TODO: extract to context
-                        window
-                            .set_cursor_position(
-                                context.screen_width as i32 / 2,
-                                context.screen_height as i32 / 2,
-                            )
-                            .unwrap();
+                        context.mouse_entered(&window);
                     }
                     MouseWheel {
                         delta: MouseScrollDelta::LineDelta(_, dy),

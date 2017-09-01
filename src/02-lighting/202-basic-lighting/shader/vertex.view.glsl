@@ -12,7 +12,9 @@ uniform Transform {
     mat4 projection;
 };
 
-uniform Light {
+uniform Lighting {
+    vec3 objectColor;
+    vec3 lightColor;
     vec3 lightPos;
 };
 

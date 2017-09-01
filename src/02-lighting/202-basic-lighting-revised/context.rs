@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 use cgmath::{Point2, Vector2};
-use glutin::{VirtualKeyCode};
+use glutin::{GlWindow, VirtualKeyCode};
 
 
 pub struct KeyState {
@@ -70,6 +70,7 @@ pub struct Context {
     pub mouse_state: MouseState,
     pub screen_width: f32,
     pub screen_height: f32,
+    mouse_reset: bool,
 }
 
 impl Context {
@@ -79,18 +80,46 @@ impl Context {
             mouse_state: MouseState::new(),
             screen_width,
             screen_height,
+            mouse_reset: true,
         };
         ctx.reset_mouse_pos();
         ctx
     }
 
+    pub fn update_mouse_pos(&mut self, window: &GlWindow, x: f32, y: f32) {
+        if self.mouse_reset {
+            if relative_eq!(x, self.screen_width / 2.0) && relative_eq!(y, self.screen_height / 2.0)
+            {
+                self.mouse_reset = false;
+            } else {
+                self.reset_mouse_pos();
+            }
+        } else {
+            self.mouse_state.update_position(x, y);
+        }
+        window
+            .set_cursor_position(self.screen_width as i32 / 2, self.screen_height as i32 / 2)
+            .unwrap();
+    }
+
     pub fn reset_mouse_pos(&mut self) {
-        self.mouse_state.update_position(self.screen_width / 2.0, self.screen_height / 2.0);
+        self.mouse_state
+            .update_position(self.screen_width / 2.0, self.screen_height / 2.0);
     }
 
     pub fn update_dimensions(&mut self, width: f32, height: f32) {
         self.screen_width = width;
         self.screen_height = height;
         self.mouse_state.update_center(width / 2.0, height / 2.0);
+    }
+
+    pub fn focused(&mut self) {
+        self.mouse_reset = true;
+    }
+
+    pub fn mouse_entered(&mut self, window: &GlWindow) {
+        window
+            .set_cursor_position(self.screen_width as i32 / 2, self.screen_height as i32 / 2)
+            .unwrap();
     }
 }

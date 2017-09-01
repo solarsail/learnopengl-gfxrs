@@ -58,13 +58,11 @@ fn main() {
         factory.create_vertex_buffer_with_slice(model::vertices().as_slice(), ());
     let obj_trans_buffer = factory.create_constant_buffer(1);
     let light_trans_buffer = factory.create_constant_buffer(1);
-    let obj_light_pos_buffer = factory.create_constant_buffer(1);
     let obj_light_buffer = factory.create_constant_buffer(1);
 
     let mut obj_data = render::obj_pipe::Data {
         vbuf: obj_vertex_buffer,
         transform: obj_trans_buffer,
-        light_pos: obj_light_pos_buffer,
         light: obj_light_buffer,
         out: render_target.clone(),
         out_depth: depth_stencil.clone(),
@@ -200,21 +198,16 @@ fn main() {
             view: view.into(),
             projection: projection.into(),
         };
-        let obj_light_pos = render::Light {
-            pos: light_pos.into(),
-        };
         let obj_light = render::Lighting::new(
             [1.0, 0.5, 0.31],
             [1.0, 1.0, 1.0],
+            light_pos.into(),
         );
 
         encoder.clear(&render_target, render::BLACK);
         encoder.clear_depth(&depth_stencil, 1.0);
         encoder
             .update_buffer(&obj_data.transform, &[obj_translation], 0)
-            .unwrap();
-        encoder
-            .update_buffer(&obj_data.light_pos, &[obj_light_pos], 0)
             .unwrap();
         encoder
             .update_buffer(&obj_data.light, &[obj_light], 0)
