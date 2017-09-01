@@ -26,12 +26,15 @@ use context::Context;
 use camera::CameraBuilder;
 
 
+const SCREEN_WIDTH: f32 = 1024.0;
+const SCREEN_HEIGHT: f32 = 768.0;
+
 fn main() {
     let mut events_loop = glutin::EventsLoop::new();
     let context = glutin::ContextBuilder::new();
     let builder = glutin::WindowBuilder::new()
         .with_title("Learn OpenGL".to_string())
-        .with_dimensions(1024, 768);
+        .with_dimensions(SCREEN_WIDTH as u32, SCREEN_HEIGHT as u32);
 
     // gfx-rs init
     let (window, mut device, mut factory, render_target, depth_stencil) =
@@ -81,20 +84,19 @@ fn main() {
 
     // Game loop
     let mut last_frame = time::Instant::now();
-    let mut dt;
     let mut running = true;
     let camera = CameraBuilder::new(Point3::new(0.0, 0.0, 3.0), Vector3::unit_y())
-        .aspect(1024.0, 768.0)
+        .aspect(SCREEN_WIDTH, SCREEN_HEIGHT)
         .build();
 
     let light_pos = Vector3::new(1.2, 1.0, 2.0);
 
-    let mut context = Context::new(1024.0, 768.0);
+    let mut context = Context::new(SCREEN_WIDTH, SCREEN_HEIGHT);
     let mut cs = CameraSystem::new(camera, 0.1);
 
     while running {
         let current_frame = time::Instant::now();
-        dt = current_frame.duration_since(last_frame);
+        let dt = current_frame.duration_since(last_frame);
         last_frame = current_frame;
         events_loop.poll_events(|event| {
             use glutin::WindowEvent::*;

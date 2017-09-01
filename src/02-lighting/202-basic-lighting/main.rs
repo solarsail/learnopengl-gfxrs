@@ -75,7 +75,6 @@ fn main() {
 
     // Game loop
     let mut last_frame = time::Instant::now();
-    let mut dt;
     let mut running = true;
     let mut width = 1024.0;
     let mut height = 768.0;
@@ -91,7 +90,7 @@ fn main() {
 
     while running {
         let current_frame = time::Instant::now();
-        dt = current_frame.duration_since(last_frame);
+        let dt = current_frame.duration_since(last_frame);
         last_frame = current_frame;
         events_loop.poll_events(|event| {
             use glutin::WindowEvent::*;

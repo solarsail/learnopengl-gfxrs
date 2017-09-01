@@ -56,6 +56,7 @@ impl CameraSystem {
         self.camera.view_matrix()
     }
 
+    #[allow(dead_code)]
     pub fn position(&self) -> Point3<f32> {
         self.camera.pos()
     }

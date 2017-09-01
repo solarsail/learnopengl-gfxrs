@@ -18,29 +18,29 @@ gfx_defines! {
         projection: [[f32; 4]; 4] = "projection",
     }
 
-    constant Lighting {
-        object: [f32; 3] = "objectColor",
-        padding1: f32 = "pad1", // prevents the shader/code offset mismatch error
-        light: [f32; 3] = "lightColor",
+    constant Light {
+        ambient: [f32; 3] = "light_ambient",
+        padding1: f32 = "pad1", // prevents the shader/code offset mismatcherror
+        diffuse: [f32; 3] = "light_diffuse",
         padding2: f32 = "pad2", // prevents the shader/code offset mismatch error
-        pos: [f32; 3] = "lightPos",
+        specular: [f32; 3] = "light_specular",
         padding3: f32 = "pad3", // prevents the shader/code offset mismatch error
-        view: [f32; 3] = "viewPos",
+        pos: [f32; 3] = "light_pos",
     }
 
     constant Material {
-        ambient: [f32; 3] = "ambient",
-        shininess: f32 = "shininess",
-        diffuse: [f32; 3] = "diffuse",
+        ambient: [f32; 3] = "material_ambient",
+        shininess: f32 = "material_shininess",
+        diffuse: [f32; 3] = "material_diffuse",
         padding1: f32 = "pad1", // prevents the shader/code offset mismatch error
-        specular: [f32; 3] = "specular",
+        specular: [f32; 3] = "material_specular",
     }
 
     pipeline obj_pipe {
         vbuf: gfx::VertexBuffer<Vertex> = (),
         transform: gfx::ConstantBuffer<Transform> = "Transform",
-        light: gfx::ConstantBuffer<Lighting> = "Lighting",
-        material: gfx::ConstantBuffer<Material> = "MaterialDef",
+        light: gfx::ConstantBuffer<Light> = "Light",
+        material: gfx::ConstantBuffer<Material> = "Material",
         out: gfx::RenderTarget<ColorFormat> = "FragColor",
         out_depth: gfx::DepthTarget<DepthFormat> = gfx::preset::depth::LESS_EQUAL_WRITE,
     }
@@ -59,22 +59,27 @@ impl Vertex {
     }
 }
 
-impl Lighting {
-    pub fn new(object: [f32; 3], light: [f32; 3], pos: [f32; 3], view: [f32; 3]) -> Lighting {
-        Lighting {
-            object,
+impl Light {
+    pub fn new(ambient: [f32; 3], diffuse: [f32; 3], specular: [f32; 3], pos: [f32; 3]) -> Light {
+        Light {
+            ambient,
             padding1: 0.0,
-            light,
+            diffuse,
             padding2: 0.0,
-            pos,
+            specular,
             padding3: 0.0,
-            view,
+            pos,
         }
     }
 }
 
 impl Material {
-    pub fn new (ambient: [f32; 3], diffuse: [f32; 3], specular: [f32; 3], shininess: f32) -> Material {
+    pub fn new(
+        ambient: [f32; 3],
+        diffuse: [f32; 3],
+        specular: [f32; 3],
+        shininess: f32,
+    ) -> Material {
         Material {
             ambient,
             shininess,

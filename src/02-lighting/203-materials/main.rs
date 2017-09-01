@@ -12,7 +12,7 @@ use std::time;
 use gfx::Device;
 use glutin::GlContext;
 use gfx::traits::FactoryExt;
-use cgmath::{Matrix4, Point3, Vector3};
+use cgmath::{Matrix4, Point3, Rad, Vector3};
 use cgmath::prelude::*;
 
 mod render;
@@ -26,12 +26,15 @@ use context::Context;
 use camera::CameraBuilder;
 
 
+const SCREEN_WIDTH: f32 = 1024.0;
+const SCREEN_HEIGHT: f32 = 768.0;
+
 fn main() {
     let mut events_loop = glutin::EventsLoop::new();
     let context = glutin::ContextBuilder::new();
     let builder = glutin::WindowBuilder::new()
         .with_title("Learn OpenGL".to_string())
-        .with_dimensions(1024, 768);
+        .with_dimensions(SCREEN_WIDTH as u32, SCREEN_HEIGHT as u32);
 
     // gfx-rs init
     let (window, mut device, mut factory, render_target, depth_stencil) =
@@ -44,14 +47,14 @@ fn main() {
 
     let obj_pso = factory
         .create_pipeline_simple(
-            include_bytes!("shader/vertex.glsl"),
+            include_bytes!("shader/obj_vertex.glsl"),
             include_bytes!("shader/obj_fragment.glsl"),
             render::obj_pipe::new(),
         )
         .unwrap();
     let light_pso = factory
         .create_pipeline_simple(
-            include_bytes!("shader/vertex.glsl"),
+            include_bytes!("shader/light_vertex.glsl"),
             include_bytes!("shader/light_fragment.glsl"),
             render::light_pipe::new(),
         )
@@ -82,21 +85,22 @@ fn main() {
     };
 
     // Game loop
+    let start_time = time::Instant::now();
     let mut last_frame = time::Instant::now();
-    let mut dt;
     let mut running = true;
     let camera = CameraBuilder::new(Point3::new(0.0, 0.0, 3.0), Vector3::unit_y())
-        .aspect(1024.0, 768.0)
+        .aspect(SCREEN_WIDTH, SCREEN_HEIGHT)
         .build();
 
     let light_pos = Vector3::new(1.2, 1.0, 2.0);
 
-    let mut context = Context::new(1024.0, 768.0);
+    let mut context = Context::new(SCREEN_WIDTH, SCREEN_HEIGHT);
     let mut cs = CameraSystem::new(camera, 0.1);
 
     while running {
         let current_frame = time::Instant::now();
-        dt = current_frame.duration_since(last_frame);
+        let dt = current_frame.duration_since(last_frame);
+        let elapsed = current_frame.duration_since(start_time);
         last_frame = current_frame;
         events_loop.poll_events(|event| {
             use glutin::WindowEvent::*;
@@ -155,8 +159,9 @@ fn main() {
             }
         });
 
-        let tvalue = dt.as_secs() as f32 + dt.subsec_nanos() as f32 / 1e9;
-        cs.run(&mut context, tvalue);
+        let dt = dt.as_secs() as f32 + dt.subsec_nanos() as f32 / 1e9;
+        let elapsed = elapsed.as_secs() as f32 + elapsed.subsec_nanos() as f32 / 1e9;
+        cs.run(&mut context, dt);
 
         let projection = cs.projection_matrix();
         let view = cs.view_matrix();
@@ -174,18 +179,19 @@ fn main() {
             view: view.into(),
             projection: projection.into(),
         };
-        let obj_light = render::Lighting::new(
-            [1.0, 0.5, 0.31],
-            [1.0, 1.0, 1.0],
+        let light_color = Vector3::new(
+            Rad(elapsed * 2.0).sin(),
+            Rad(elapsed * 0.7).sin(),
+            Rad(elapsed * 1.3).sin(),
+        );
+        let obj_light = render::Light::new(
+            (light_color * 0.1).into(),
+            (light_color * 0.5).into(),
+            light_color.into(),
             light_pos.into(),
-            cs.position().into(),
         );
-        let obj_material = render::Material::new(
-            [1.0, 0.5, 0.31],
-            [1.0, 0.5, 0.31],
-            [0.5, 0.5, 0.5],
-            32.0
-        );
+        let obj_material =
+            render::Material::new([1.0, 0.5, 0.31], [1.0, 0.5, 0.31], [0.5, 0.5, 0.5], 32.0);
 
         encoder.clear(&render_target, render::BLACK);
         encoder.clear_depth(&depth_stencil, 1.0);
