@@ -63,3 +63,7 @@ path = "src/02-lighting/202-basic-lighting-revised/main.rs"
 [[bin]]
 name = "materials"
 path = "src/02-lighting/203-materials/main.rs"
+
+[[bin]]
+name = "lighting-maps"
+path = "src/02-lighting/204-lighting-maps/main.rs"
