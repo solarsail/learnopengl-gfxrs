@@ -7,10 +7,14 @@ authors = ["solarsail <newleaf.lu@gmail.com>"]
 gfx = "0.16"
 glutin = "0.9"
 gfx_window_glutin = "0.17"
+gfx_device_gl = "0.14"
 image = "0.15"
 cgmath = "0.15"
 find_folder = "0.3"
 lazy_static = "0.2"
+structopt = "0.1"
+structopt-derive = "0.1"
+spin_sleep = "0.3"
 
 [[bin]]
 name = "hello-window"
@@ -67,3 +71,7 @@ path = "src/02-lighting/203-materials/main.rs"
 [[bin]]
 name = "lighting-maps"
 path = "src/02-lighting/204-lighting-maps/main.rs"
+
+[[bin]]
+name = "multiple-lights"
+path = "src/02-lighting/206-multiple-lights/main.rs"
